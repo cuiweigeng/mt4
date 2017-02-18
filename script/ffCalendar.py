@@ -4,15 +4,18 @@ from __future__ import unicode_literals
 import sys
 import datetime
 import getopt
-# import codecs
 import pprint
 import lxml.html
 import mechanize
 import cookielib
+import pdb
 
 # some utils
 pp = pprint.PrettyPrinter()
-debug = 0
+debug = 1
+
+if debug == 1:
+	pdb.set_trace()
 
 
 #########################

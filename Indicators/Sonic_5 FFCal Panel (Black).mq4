@@ -257,40 +257,44 @@ int init() {
     W = 0;
   }
     
-	SetIndexBuffer(0, ExtMapBuffer0);
+  SetIndexBuffer(0, ExtMapBuffer0);
   SetIndexStyle(0, DRAW_NONE);		
   IndicatorShortName("FFCal");    
    
   Deinitialized = false;
  	  		
-	return(0);
+  return(0);
 }
    
 //+----------------------------------------------------------------------------+
 //| Indicator De-initialization                                                |
 //+----------------------------------------------------------------------------+
-int deinit()
-   {         
-   int obj_total= ObjectsTotal();  
-   for (i= obj_total; i>=0; i--) {
-      string name= ObjectName(i);
-      if (StringSubstr(name,0,8)=="z[FFCal]") {ObjectDelete(name);}} 
- 	  
-	return(0);
-   }
+int deinit() {         
+  int obj_total= ObjectsTotal();  
+  for (i= obj_total; i>=0; i--) {
+    string name= ObjectName(i);
+    if (StringSubstr(name,0,8)=="z[FFCal]") {
+	  ObjectDelete(name);
+	}
+  } 	  
+  return(0);
+}
   
-//+-----------------------------------------------------------------------------------------------+
-//| Indicator Start                                                                               |
-//+-----------------------------------------------------------------------------------------------+  
-int start()
-   {
+//+----------------------------------------------------------------------------+
+//| Indicator Start                                                            |
+//+----------------------------------------------------------------------------+
+int start() {
    //If Indicator is "Off" or chart is out of range deinitialize only once, not every tick.
-   if((!Indicator_On) || ((Period() < Display_Min_TF) || (Period() > Display_Max_TF)))        
-      {
-      if (!Deinitialized)  {deinit(); Deinitialized = true;}
-      //deleting old versions xml file 
-      return(0);
-      }    
+  if((!Indicator_On) 
+    || ((Period() < Display_Min_TF) 
+    || (Period() > Display_Max_TF))) {
+      if (!Deinitialized)  {
+		deinit(); 
+		Deinitialized = true;
+    }
+    //deleting old versions xml file 
+    return(0);
+  }    
 
    InitNews(sUrl);
 

@@ -501,7 +501,7 @@ int start() {
           ((dispImpact[0] == "Medium" && dispImpact[4] == "High")  ||
           (dispImpact[0]  == "Low" && dispImpact[4] == "High")  ||
           (dispImpact[0]  == "Low" && dispImpact[4] == "Medium"))) {		 	   
-          dispTitle[0]	= dispTitle[4];
+          dispTitle[0]   = dispTitle[4];
           dispCountry[0] = dispCountry[4];
           dispImpact[0]  = dispImpact[4];
           dispMinutes[0] = dispMinutes[4];

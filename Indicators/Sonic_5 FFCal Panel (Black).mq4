@@ -156,15 +156,15 @@ extern int    Offset_Hours	                  = 0; // Set to "0" to not adjust ti
 extern string ___                             = "";
 extern string Part_3                          = "Other Currency News Settings:";
 extern bool   Show_USD_News                   = false; // "true" = USD news on non-USD pair charts 
-extern bool	  Show_EUR_News                   = false; 
-extern bool	  Show_GBP_News                   = false;
-extern bool	  Show_NZD_News                   = false;
-extern bool	  Show_JPY_News                   = false;
-extern bool	  Show_AUD_News                   = false;
-extern bool	  Show_CAD_News                   = false; 
-extern bool	  Show_CHF_News                   = false;
-extern bool	  Show_CNY_News                   = false;
-extern bool	  Ignore_Current_Symbol           = false;
+extern bool   Show_EUR_News                   = false; 
+extern bool   Show_GBP_News                   = false;
+extern bool   Show_NZD_News                   = false;
+extern bool   Show_JPY_News                   = false;
+extern bool   Show_AUD_News                   = false;
+extern bool   Show_CAD_News                   = false; 
+extern bool   Show_CHF_News                   = false;
+extern bool   Show_CNY_News                   = false;
+extern bool   Ignore_Current_Symbol           = false;
 
 //global buffers and variables---------------------------------------------------------------------
 bool          Deinitialized, skip; 

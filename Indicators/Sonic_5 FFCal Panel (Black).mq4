@@ -304,7 +304,7 @@ int start() {
     }
     // otherwise, we've switched time frame and do not need to skip every 10 s,
     // thus immediately execute all of the start() function code   
-    else    {
+    else {
       PrevTF = Period();
     }
   }
@@ -334,8 +334,8 @@ int start() {
   for (i=0; i<=9; i++) {
     dispTitle[i]   = "";
     dispCountry[i] = "";
-    dispImpact[i] 	= "";
-    dispMinutes[i]	= 0;	
+    dispImpact[i]  = "";
+    dispMinutes[i] = 0;	
   }
   
   //Parse the XML file looking for an event to report		
@@ -392,7 +392,7 @@ int start() {
     //Test against filters that define whether we want to skip this particular announcement
     if(!IsNewsCurrency(Symbol(),mainData[newsIdx][COUNTRY]))	{ //deVries
       skip = true;
-    }	else if ((!Medium_Impact_News_On)
+    } else if ((!Medium_Impact_News_On)
       && (mainData[newsIdx][IMPACT] == "Medium")) {
       skip = true;
     } else if ((!Low_Impact_News_On) 
@@ -412,8 +412,7 @@ int start() {
     }			  	
     
     //If not skipping this event, then log time to event it into ExtMapBuffer0
-    if (!skip)
-    {   
+    if (!skip) {   
       //If we got this far then we need to calc the minutes until this event
       //First, convert the announcement time to seconds (in GMT)
       newsTime = MakeDateTime(mainData[newsIdx][DATE], mainData[newsIdx][TIME]);			
@@ -542,8 +541,7 @@ int start() {
       //If 1st event [0] is not done with prioritization, and         		   
       //if time [i] = [0] and [i] has > impact than [0] then [i] becomes 1st event [0].
       //Otherwise, if time [i] > [0] then initialize [i] as 2nd event [1]: 
-      if (!FLAG_done0) 
-      { 
+      if (!FLAG_done0) { 
         if ((dispMinutes[0] == dispMinutes[6]) && 			
         ((dispImpact[0]  == "Medium" && dispImpact[6] == "High")  ||
         (dispImpact[0]   == "Low"    && dispImpact[6] == "High")  || 
@@ -565,8 +563,7 @@ int start() {
       //If 1st event [0] is done prioritization, but 2nd event [1] is not, and   
       //if time [i] = [1] and [i] has > impact than [1], then [i] becomes 2nd event [1].
       //Otherwise, if time [i] > [1] then intialize [i] as 3rd event [2]: 
-      if ((FLAG_done0) && (!FLAG_done1)) 
-      {			 			   	
+      if ((FLAG_done0) && (!FLAG_done1)) {			 			   	
         if ((dispMinutes[1] == dispMinutes[6]) && 		
         ((dispImpact[1]  == "Medium" && dispImpact[6] == "High")  ||
         (dispImpact[1]   == "Low"    && dispImpact[6] == "High")  || 
@@ -588,8 +585,7 @@ int start() {
       //If 1st event [0] and 2nd event [1] are done, but 3rd event [2] is not, and
       //if time [i] = [2] and [i] has > impact than [2], then [i] becomes 3rd event [2].
       //Otherwise, if time [i] > [2] then intialize [i] as 4th event [3]:  	
-      if ((FLAG_done0) && (FLAG_done1) && (!FLAG_done2)) 
-      {						   
+      if ((FLAG_done0) && (FLAG_done1) && (!FLAG_done2)) {						   
         if ((dispMinutes[2] == dispMinutes[6]) && 		
         ((dispImpact[2]  == "Medium" && dispImpact[6] == "High")  ||
         (dispImpact[2]   == "Low"    && dispImpact[6] == "High")  || 
@@ -693,26 +689,26 @@ int start() {
   //events up one tier and insert the Bank Holiday into 1st event.
   if (BankIdx1 == 1) {      
     dispTitle[3]    = dispTitle[2];
-    dispCountry[3] 	= dispCountry[2];
-    dispImpact[3]  	= dispImpact[2];
-    dispMinutes[3] 	= dispMinutes[2];
+    dispCountry[3]  = dispCountry[2];
+    dispImpact[3]   = dispImpact[2];
+    dispMinutes[3]  = dispMinutes[2];
     FLAG_none3      = FLAG_none2;
     
     dispTitle[2]    = dispTitle[1];
-    dispCountry[2] 	= dispCountry[1];
-    dispImpact[2]  	= dispImpact[1];
-    dispMinutes[2] 	= dispMinutes[1];
+    dispCountry[2]  = dispCountry[1];
+    dispImpact[2]   = dispImpact[1];
+    dispMinutes[2]  = dispMinutes[1];
     FLAG_none2      = FLAG_none1;
     
     dispTitle[1]    = dispTitle[0];
-    dispCountry[1] 	= dispCountry[0];
-    dispImpact[1]  	= dispImpact[0];
-    dispMinutes[1] 	= dispMinutes[0];
+    dispCountry[1]  = dispCountry[0];
+    dispImpact[1]   = dispImpact[0];
+    dispMinutes[1]  = dispMinutes[0];
     FLAG_none1      = FLAG_none0;
     
     dispTitle[0]    = dispTitle[7];
     dispCountry[0]  = dispCountry[7];
-    dispImpact[0]  	= dispImpact[7];
+    dispImpact[0]   = dispImpact[7];
     dispMinutes[0]  = dispMinutes[7];
     FLAG_none0      = false;
   }
@@ -1009,8 +1005,7 @@ void OutputToChart() {
   TxtColorNews = ImpactToColor(dispImpact[1]);	 	      	
   ObjectDelete(News2);       	
   ObjectCreate(News2, OBJ_LABEL, W, 0, 0);
-  if((index != -1) || (FLAG_none1)) 
-  {		       
+  if((index != -1) || (FLAG_none1)) {		       
     ObjectSetText(News2, "(2)  Additional news per settings is not scheduled", 
     TxtSize, Text_Style, Remarks_Color);
     event[2] = "(2)  Additional news per settings is not scheduled";

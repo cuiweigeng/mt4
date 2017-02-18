@@ -326,7 +326,7 @@ int start() {
     FileClose(xmlHandle);
   }
 
-	//Clear prioritization data
+  //Clear prioritization data
   BankIdx1   = 0; 
   FLAG_done0 = false; 
   FLAG_done1 = false;  
@@ -339,108 +339,107 @@ int start() {
   for (i=0; i<=9; i++) {
     dispTitle[i]   = "";
     dispCountry[i] = "";
-    dispImpact[i] 	= "";
-    dispMinutes[i]	= 0;	
+    dispImpact[i]  = "";
+    dispMinutes[i] = 0;	
   }
 
-	//Parse the XML file looking for an event to report		
-	newsIdx = 0;
-	nextNewsIdx = -1;	
-	tmpMins = 10080;	// (a week)
-	BoEvent = 0;
-	while (true)
-   	{
-		BoEvent = StringFind(sData, "<event>", BoEvent);
-		if (BoEvent == -1) break;			
-		BoEvent += 7;	
-		next = StringFind(sData, "</event>", BoEvent);
-		if (next == -1) break;	
-		myEvent = StringSubstr(sData, BoEvent, next - BoEvent);
-		BoEvent = next;		
-		begin = 0;
-		skip = false;
-		for (i=0; i < 7; i++)
-		   {
-			mainData[newsIdx][i] = "";
-			next = StringFind(myEvent, sTags[i], begin);			
-			// Within this event, if tag not found, then it must be missing; skip it
-			if (next == -1) continue;
-			else
-			   {
-				// We must have found the sTag okay...
-				begin = next + StringLen(sTags[i]);		   	// Advance past the start tag
-				end = StringFind(myEvent, eTags[i], begin);	// Find start of end tag
-				//Get data between start and end tag
-				if (end > begin && end != -1) 
-				   {mainData[newsIdx][i] = StringSubstr(myEvent, begin, end - begin);}
-			   }
-		   }//End "for" loop
-	
-		//Test against filters that define whether we want to skip this particular announcement
-		if(!IsNewsCurrency(Symbol(),mainData[newsIdx][COUNTRY]))	//deVries
-			{skip = true;}	
+  //Parse the XML file looking for an event to report		
+  newsIdx = 0;
+  nextNewsIdx = -1;	
+  tmpMins = 10080;	// (a week)
+  BoEvent = 0;
+  while (true) {
+    BoEvent = StringFind(sData, "<event>", BoEvent);
+    if (BoEvent == -1) {
+      break;			
+	}
+    BoEvent += 7;	
+    next = StringFind(sData, "</event>", BoEvent);
+    if (next == -1) break;	
+    myEvent = StringSubstr(sData, BoEvent, next - BoEvent);
+    BoEvent = next;		
+    begin = 0;
+    skip = false;
+    for (i=0; i < 7; i++) {
+      mainData[newsIdx][i] = "";
+      next = StringFind(myEvent, sTags[i], begin);			
+      // Within this event, if tag not found, then it must be missing; skip it
+      if (next == -1) continue;
+      else {
+        // We must have found the sTag okay...
+        begin = next + StringLen(sTags[i]); // Advance past the start tag
+        end = StringFind(myEvent, eTags[i], begin); // Find start of end tag
+        //Get data between start and end tag
+        if (end > begin && end != -1) {
+          mainData[newsIdx][i] = StringSubstr(myEvent, begin, end - begin);
+        }
+      }
+    } 
 
-		else if ((!Medium_Impact_News_On) && 
-		   (mainData[newsIdx][IMPACT] == "Medium"))
-		   {skip = true;} 
-		   														   
-		else if ((!Low_Impact_News_On) && 
-		   (mainData[newsIdx][IMPACT] == "Low"))
-		   {skip = true;} 
+    //Test against filters that define whether we want to skip this particular announcement
+    if(!IsNewsCurrency(Symbol(),mainData[newsIdx][COUNTRY])) { //deVries
+      skip = true;
+    } else if ((!Medium_Impact_News_On) 
+               && (mainData[newsIdx][IMPACT] == "Medium")) {
+      skip = true;
+    } else if ((!Low_Impact_News_On) 
+               && (mainData[newsIdx][IMPACT] == "Low")) {
+      skip = true;
+    } 
 
-		//else if (!StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank")
-		else if ((!Bank_Holiday_On) && (StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank"))
-		    {skip = true;}
-		    
-		else if (!StringSubstr(mainData[newsIdx][TITLE],0,8)== "Daylight")
-		    {skip = true;}    	
-			
-   	else if ((mainData[newsIdx][TIME] == "All Day" && mainData[newsIdx][TIME] == "") || 
-		   (mainData[newsIdx][TIME] == "Tentative" && mainData[newsIdx][TIME] == "")     ||
-		  	(mainData[newsIdx][TIME] == ""))
-		  	{skip = true;}			  	
-		    				  	 				  	 
-		//If not skipping this event, then log time to event it into ExtMapBuffer0
-		if (!skip)
-		   {   
-			//If we got this far then we need to calc the minutes until this event
-			//First, convert the announcement time to seconds (in GMT)
-			newsTime = MakeDateTime(mainData[newsIdx][DATE], mainData[newsIdx][TIME]);			
-			// Now calculate the minutes until this announcement (may be negative)
-			minsTillNews = (newsTime - TimeGMT()) / 60;
-			
-         //If this is a Bank Holiday current or past event, 
-         //then skip it by changing time to 2 days back
-         if ((StringFind(mainData[newsIdx][TITLE], "Bank Holiday", 
-            StringLen(mainData[newsIdx][TITLE])-12) != -1) && (minsTillNews <= 0))
-            {
-            minsTillNews = minsTillNews - 2880;
-            }
-            
-			//At this point, only events applicable to the pair ID/Symbol are being processed:
-			//Find the most recent past event.  Do this by incrementing idxOfNext for each event 
-			//with a past time, (i.e. minsTillNews < 0).  When coming upon the first event with 
-			//minsTillNews > 0, idxOfNext is not incremented, and therefore continues to be for 
-			//the most recent past event.  It does not get incremented again until the absolute 
-			//value of the time since this most recent past event exceeds the time to the next
-			//future event.
-			
-			if (minsTillNews < 0 || MathAbs(tmpMins) > minsTillNews)	
-			   {idxOfNext = newsIdx; tmpMins	= minsTillNews;}	
-						
-			//Do alert if user has enabled
-			if (Alert_Minutes_Before != 0 && minsTillNews == Alert_Minutes_Before)
-				Alert(Alert_Minutes_Before, " minutes until news for ", 
-				mainData[newsIdx][COUNTRY], ": ", mainData[newsIdx][TITLE]);
-						
-			//ExtMapBuffer0 contains the time UNTIL each announcement (can be negative)
-			//e.g. [0] = -372; [1] = 25; [2] = 450; [3] = 1768 (etc.)
-			ExtMapBuffer0[newsIdx] = minsTillNews;
-			
-			newsIdx++;
-		   }//End "skip" routine
-	   }//End "while" routine
-	   
+//else if (!StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank")
+else if ((!Bank_Holiday_On) && (StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank"))
+{skip = true;}
+
+else if (!StringSubstr(mainData[newsIdx][TITLE],0,8)== "Daylight")
+{skip = true;}    	
+
+else if ((mainData[newsIdx][TIME] == "All Day" && mainData[newsIdx][TIME] == "") || 
+(mainData[newsIdx][TIME] == "Tentative" && mainData[newsIdx][TIME] == "")     ||
+(mainData[newsIdx][TIME] == ""))
+{skip = true;}			  	
+
+//If not skipping this event, then log time to event it into ExtMapBuffer0
+if (!skip)
+{   
+//If we got this far then we need to calc the minutes until this event
+//First, convert the announcement time to seconds (in GMT)
+newsTime = MakeDateTime(mainData[newsIdx][DATE], mainData[newsIdx][TIME]);			
+// Now calculate the minutes until this announcement (may be negative)
+minsTillNews = (newsTime - TimeGMT()) / 60;
+
+//If this is a Bank Holiday current or past event, 
+//then skip it by changing time to 2 days back
+if ((StringFind(mainData[newsIdx][TITLE], "Bank Holiday", 
+StringLen(mainData[newsIdx][TITLE])-12) != -1) && (minsTillNews <= 0))
+{
+minsTillNews = minsTillNews - 2880;
+}
+
+//At this point, only events applicable to the pair ID/Symbol are being processed:
+//Find the most recent past event.  Do this by incrementing idxOfNext for each event 
+//with a past time, (i.e. minsTillNews < 0).  When coming upon the first event with 
+//minsTillNews > 0, idxOfNext is not incremented, and therefore continues to be for 
+//the most recent past event.  It does not get incremented again until the absolute 
+//value of the time since this most recent past event exceeds the time to the next
+//future event.
+
+if (minsTillNews < 0 || MathAbs(tmpMins) > minsTillNews)	
+{idxOfNext = newsIdx; tmpMins	= minsTillNews;}	
+
+//Do alert if user has enabled
+if (Alert_Minutes_Before != 0 && minsTillNews == Alert_Minutes_Before)
+Alert(Alert_Minutes_Before, " minutes until news for ", 
+mainData[newsIdx][COUNTRY], ": ", mainData[newsIdx][TITLE]);
+
+//ExtMapBuffer0 contains the time UNTIL each announcement (can be negative)
+//e.g. [0] = -372; [1] = 25; [2] = 450; [3] = 1768 (etc.)
+ExtMapBuffer0[newsIdx] = minsTillNews;
+
+newsIdx++;
+}//End "skip" routine
+}//End "while" routine
+
 	//----------------------------------------------------------------------------------------------
 	//Prioritization coding:  Cycle thru the range of "newsIdx" prioritizing events for display.
 	for (i=0; i < newsIdx; i++)

@@ -113,7 +113,6 @@ Background_Color_                    White                 Black
 
 -------------------------------------------------------------------------------------------------*/
 
-	
 //+-----------------------------------------------------------------------------------------------+
 //| Indicator Global Inputs                                                                       |
 //+-----------------------------------------------------------------------------------------------+
@@ -131,13 +130,14 @@ Background_Color_                    White                 Black
 #define FORECAST	5
 #define PREVIOUS	6
 
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385483(v=vs.85).aspx
 #import  "Wininet.dll"
-   int InternetOpenW(string, int, string, string, int);
-   int InternetConnectW(int, string, int, string, string, int, int, int); 
-   int HttpOpenRequestW(int, string, string, int, string, int, string, int); 
-   int InternetOpenUrlW(int, string, string, int, int, int);
-   int InternetReadFile(int, uchar & arr[], int, int & arr[]);
-   int InternetCloseHandle(int);    
+int InternetOpenW(string, int, string, string, int);
+int InternetConnectW(int, string, int, string, string, int, int, int); 
+int HttpOpenRequestW(int, string, string, int, string, int, string, int); 
+int InternetOpenUrlW(int, string, string, int, int, int);
+int InternetReadFile(int, uchar & arr[], int, int & arr[]);
+int InternetCloseHandle(int);    
 #import
 
 //global external inputs---------------------------------------------------------------------------
@@ -151,7 +151,7 @@ extern string TF_Choices                      = "1-5-15-30-60-240-1440-10080-432
 
 extern string __                              = "";
 extern string Part_2                          = "Headline Display Settings:";
-extern color  FFCal_Title 	                   = C'180,180,180'; 
+extern color  FFCal_Title 	                  = C'180,180,180'; 
 extern color  Low_Impact_News_Color           = C'046,186,046';
 extern bool   Low_Impact_News_On              = true;             
 extern color  Medium_Impact_News_Color        = C'086,138,235';
@@ -162,12 +162,12 @@ extern bool   Bank_Holiday_On                 = true;
 extern color  Remarks_Color                   = DimGray;
 extern bool   Show_Panel_Background           = true;     
 extern color  Background_Color_               = C'010,010,010';
-extern int	  Alert_Minutes_Before            = 0;	    //Set to "0" for no Alert
-extern int	  Offset_Hours	                   = 0;     //Set to "0" to not adjust time/DST settings
+extern int	  Alert_Minutes_Before            = 0; // Set to "0" for no Alert
+extern int	  Offset_Hours	                  = 0; // Set to "0" to not adjust time/DST settings
 
 extern string ___                             = "";
 extern string Part_3                          = "Other Currency News Settings:";
-extern bool	  Show_USD_News                   = false; //"true" = USD news on non-USD pair charts 
+extern bool	  Show_USD_News                   = false; // "true" = USD news on non-USD pair charts 
 extern bool	  Show_EUR_News                   = false; 
 extern bool	  Show_GBP_News                   = false;
 extern bool	  Show_NZD_News                   = false;
@@ -184,8 +184,8 @@ bool          FLAG_done0, FLAG_done1, FLAG_done2, FLAG_done3;
 bool          FLAG_none0, FLAG_none1, FLAG_none2, FLAG_none3; 
 int           BankIdx1,cnr;
 color         TxtColorNews;
-datetime      newsTime,calendardate;   //sundaydate calendar
-double   	  ExtMapBuffer0[];     // Contains (minutes until) each news event
+datetime      newsTime,calendardate; // sundaydate calendar
+double   	    ExtMapBuffer0[]; // Contains (minutes until) each news event
 int 	        xmlHandle, BoEvent, finalend, end, begin, minsTillNews, tmpMins, idxOfNext,
               dispMinutes[9], newsIdx, next, nextNewsIdx, dispMins, Days, Hours, Mins;
 int           dayStart,monthStart,F1,F2,i,j,k,curY,W,sx,sfx,Box,x1,x2,x3,y1,y2,y3,index;
@@ -194,252 +194,257 @@ int           TxtSize       = 7;
 int           TitleSpacer   = 7;
 int           EventSpacer   = 4; 
 int           curX          = 3;       
-static int	  PrevMinute    = -1;
-string 		  xmlFileName;
+static int    PrevMinute    = -1;
+string        xmlFileName;
 string        xmlSearchName;
 int           PrevTF        = 0;      
-static int	  UpdateRateSec = 10;
-string	     sUrl = "http://www.forexfactory.com/ff_calendar_thisweek.xml"; //original
-string   	  myEvent,mainData[100][7], sData, csvoutput, sinceUntil, TimeStr;
-string    	  G,/*pair, cntry1, cntry2,*/ dispTitle[9], dispCountry[9], dispImpact[9],event[4];
-string 	     sTags[7] = { "<title>", "<country>", "<date><![CDATA[","<time><![CDATA[",
-              "<impact><![CDATA[", "<forecast><![CDATA[", "<previous><![CDATA[" };
-string 	     eTags[7] = { "</title>", "</country>", "]]></date>", "]]></time>",
-              "]]></impact>", "]]></forecast>", "]]></previous>" };
+static int    UpdateRateSec = 10;
+string        sUrl = "http://www.forexfactory.com/ff_calendar_thisweek.xml"; //original
+string   	    myEvent,mainData[100][7], sData, csvoutput, sinceUntil, TimeStr;
+string        G,/*pair, cntry1, cntry2,*/ dispTitle[9], dispCountry[9], dispImpact[9],event[4];
+string        sTags[7] = { "<title>", 
+                           "<country>", 
+                           "<date><![CDATA[",
+                           "<time><![CDATA[",
+                           "<impact><![CDATA[", 
+                           "<forecast><![CDATA[", 
+                           "<previous><![CDATA[" };
+string        eTags[7] = { "</title>", 
+                           "</country>", 
+                           "]]></date>", 
+                           "]]></time>",
+                           "]]></impact>", 
+                           "]]></forecast>", 
+                           "]]></previous>" };
 string        Text_Style = "Arial";     
-string        box1    = "z[FFCal] Box1";
-string        box2    = "z[FFCal] Box2";
-string        News1   = "z[FFCal] News1";
-string        News2   = "z[FFCal] News2";
-string        News3   = "z[FFCal] News3";
-string        News4   = "z[FFCal] News4";
-string        Sponsor = "z[FFCal] Sponsor";  
+string        box1       = "z[FFCal] Box1";
+string        box2       = "z[FFCal] Box2";
+string        News1      = "z[FFCal] News1";
+string        News2      = "z[FFCal] News2";
+string        News3      = "z[FFCal] News3";
+string        News4      = "z[FFCal] News4";
+string        Sponsor    = "z[FFCal] Sponsor";  
 
-//+----------------------------------------------------------------------------+
-//| Indicator Initialization                                                   |
-//+----------------------------------------------------------------------------+
+//+-----------------------------------------------------------------------------------------------+
+//| Indicator Initialization                                                                      |
+//+-----------------------------------------------------------------------------------------------+
 int init() {
-   // Get current time frame
+  // Get current time frame
   PrevTF = Period();
-  /* Make sure we are connected. Otherwise exit.   
-  With the first DLL call below, the program will exit (and stop) 
-  automatically after one alert. */
+  
+  // Make sure we are connected.  Otherwise exit.   
+  // With the first DLL call below, the program will exit (and stop) automatically after one alert. 
   if ( !IsDllsAllowed() ) {
-    Alert(Symbol(), " ", Period(), ", FFCal: Allow DLL Imports");   
-  }
-      	
-	/* deVries: Management of FFCal.xml Files involves setting up a search to find
-	and delete files that are not of this Sunday date. This search is limited to 
-	10 weeks back (604800 seconds). Files with Sunday dates that are older will 
-	not be purged by this search and will have to bemanually deleted by the user.*/
-	xmlFileName = GetXmlFileName();		 
-  for (k=calendardate; k>=calendardate-6048000; k=k-604800) {
-    xmlSearchName = (StringConcatenate(TimeYear(k),"-",
-      PadString(DoubleToStr(TimeMonth(k),0),"0",2),"-",
-      PadString(DoubleToStr(TimeDay(k),0),"0",2),"-FFCal-News",".xml"));
-    xmlHandle = FileOpen(xmlSearchName, FILE_BIN|FILE_READ);
-	  //file exists.  A return of -1 means file does not exist.
-	  if(xmlHandle >= 0) {
-	    FileClose(xmlHandle); 
-	    if(xmlSearchName != xmlFileName) {
-	      FileDelete(xmlSearchName);
-	    }
-	  }
+    Alert(Symbol()," ",Period(),", FFCal: Allow DLL Imports");   
   }
   
-  cnr = 2; 
-  if(Allow_Panel_At_Chart_Right) {
-    cnr = 3;
-  }   
-  if(Allow_Panel_In_Subwindow_1 && WindowsTotal() > 1) {
-    W = 1;
-  } else {
-    W = 0;
+  //deVries: Management of FFCal.xml Files involves setting up a search to find and delete files
+  //that are not of this Sunday date.  This search is limited to 10 weeks back (604800 seconds). 
+  //Files with Sunday dates that are older will not be purged by this search and will have to be
+  //manually deleted by the user.
+  xmlFileName = GetXmlFileName();		 
+  for (k=calendardate;k>=calendardate-6048000;k=k-604800)
+  {
+  xmlSearchName =  (StringConcatenate(TimeYear(k),"-",
+  PadString(DoubleToStr(TimeMonth(k),0),"0",2),"-",
+  PadString(DoubleToStr(TimeDay(k),0),"0",2),"-FFCal-News",".xml"));
+  xmlHandle = FileOpen(xmlSearchName, FILE_BIN|FILE_READ);
+  if(xmlHandle >= 0) //file exists.  A return of -1 means file does not exist.
+  {
+  FileClose(xmlHandle); 
+  if(xmlSearchName != xmlFileName)FileDelete(xmlSearchName);       
   }
-    
+  }
+  
+  
+  cnr = 2; if(Allow_Panel_At_Chart_Right) {cnr = 3;}   
+  if(Allow_Panel_In_Subwindow_1 && WindowsTotal( ) > 1){W= 1;}
+  else {W= 0;}
+  
   SetIndexBuffer(0, ExtMapBuffer0);
   SetIndexStyle(0, DRAW_NONE);		
   IndicatorShortName("FFCal");    
-   
+  
   Deinitialized = false;
- 	  		
+  
   return(0);
 }
    
-//+----------------------------------------------------------------------------+
-//| Indicator De-initialization                                                |
-//+----------------------------------------------------------------------------+
+//+-----------------------------------------------------------------------------------------------+
+//| Indicator De-initialization                                                                   |
+//+-----------------------------------------------------------------------------------------------+
 int deinit() {         
   int obj_total= ObjectsTotal();  
   for (i= obj_total; i>=0; i--) {
     string name= ObjectName(i);
     if (StringSubstr(name,0,8)=="z[FFCal]") {
-	  ObjectDelete(name);
-	}
-  } 	  
+      ObjectDelete(name);
+    }
+  } 
   return(0);
 }
   
-//+----------------------------------------------------------------------------+
-//| Indicator Start                                                            |
-//+----------------------------------------------------------------------------+
-int start() {
-  /* If Indicator is "Off" or chart is out of range deinitialize only once, 
-  not every tick.*/
-  if((!Indicator_On) 
-    || ((Period() < Display_Min_TF) 
-    || (Period() > Display_Max_TF))) {
-      if (!Deinitialized) {
-        deinit(); 
-        Deinitialized = true;
-    }
-    //deleting old versions xml file 
-    return(0);
-  }    
+//+-----------------------------------------------------------------------------------------------+
+//| Indicator Start                                                                               |
+//+-----------------------------------------------------------------------------------------------+  
+int start()
+   {
+   //If Indicator is "Off" or chart is out of range deinitialize only once, not every tick.
+   if((!Indicator_On) || ((Period() < Display_Min_TF) || (Period() > Display_Max_TF)))        
+      {
+      if (!Deinitialized)  {deinit(); Deinitialized = true;}
+      //deleting old versions xml file 
+      return(0);
+      }    
 
-  InitNews(sUrl);
+   InitNews(sUrl);
 
-  /* qFish----------------------------------------------------------------------
-  Perform remaining checks once per UpdateRateSec 
-  (Refreshing News from XML file) */
-  if(PrevTF == Period()) {
-    //if we haven't changed time frame then keep doing what we are doing
-    if(MathMod(Seconds(), UpdateRateSec) == 0) {
-      return (true);
-    }
-    // otherwise, we've switched time frame and do not need to skip every 10 s,
-    // thus immediately execute all of the start() function code   
-    else {
-      PrevTF = Period();
-    }
-  }
-
-  //Init the buffer array to zero just in case
-  ArrayInitialize(ExtMapBuffer0, 0);
-	
-  // deVries--------------------------------------------------------------------
-  // New xml file handling coding and revised parsing coding
-  xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ);
-  if(xmlHandle >= 0) {
-    int size = FileSize(xmlHandle);
-    sData = FileReadString(xmlHandle, size);	
-    FileClose(xmlHandle);
-  }
-
-  //Clear prioritization data
-  BankIdx1   = 0; 
-  FLAG_done0 = false; 
-  FLAG_done1 = false;  
-  FLAG_done2 = false;
-  FLAG_done3 = false;
-  FLAG_none0 = false;    
-  FLAG_none1 = false; 
-  FLAG_none2 = false;
-  FLAG_none3 = false;  
-  for (i=0; i<=9; i++) {
-    dispTitle[i]   = "";
-    dispCountry[i] = "";
-    dispImpact[i]  = "";
-    dispMinutes[i] = 0;	
-  }
-
-  //Parse the XML file looking for an event to report		
-  newsIdx = 0;
-  nextNewsIdx = -1;	
-  tmpMins = 10080;	// (a week)
-  BoEvent = 0;
-  while (true) {
-    BoEvent = StringFind(sData, "<event>", BoEvent);
-    if (BoEvent == -1) {
-      break;			
-	}
-    BoEvent += 7;	
-    next = StringFind(sData, "</event>", BoEvent);
-    if (next == -1) break;	
-    myEvent = StringSubstr(sData, BoEvent, next - BoEvent);
-    BoEvent = next;		
-    begin = 0;
-    skip = false;
-    for (i=0; i < 7; i++) {
-      mainData[newsIdx][i] = "";
-      next = StringFind(myEvent, sTags[i], begin);			
-      // Within this event, if tag not found, then it must be missing; skip it
-      if (next == -1) continue;
-      else {
-        // We must have found the sTag okay...
-        begin = next + StringLen(sTags[i]); // Advance past the start tag
-        end = StringFind(myEvent, eTags[i], begin); // Find start of end tag
-        //Get data between start and end tag
-        if (end > begin && end != -1) {
-          mainData[newsIdx][i] = StringSubstr(myEvent, begin, end - begin);
-        }
+	//qFish-----------------------------------------------------------------------------------------
+	//Perform remaining checks once per UpdateRateSec (Refreshing News from XML file)
+   if(PrevTF==Period())  
+      {
+      //if we haven't changed time frame then keep doing what we are doing
+      if(MathMod(Seconds(),UpdateRateSec)==0)
+         {
+         return (true);
+         }
+      //otherwise, we've switched time frame and do not need to skip every 10 s,
+      //thus immediately execute all of the start() function code   
+      else   
+         {
+         PrevTF = Period();
+         }
       }
-    } 
 
-    //Test against filters that define whether we want to skip this particular announcement
-    if(!IsNewsCurrency(Symbol(),mainData[newsIdx][COUNTRY])) { //deVries
-      skip = true;
-    } else if ((!Medium_Impact_News_On) 
-               && (mainData[newsIdx][IMPACT] == "Medium")) {
-      skip = true;
-    } else if ((!Low_Impact_News_On) 
-               && (mainData[newsIdx][IMPACT] == "Low")) {
-      skip = true;
-    } 
+	//Init the buffer array to zero just in case
+	ArrayInitialize(ExtMapBuffer0, 0);
+	
+	//deVries---------------------------------------------------------------------------------------
+	//New xml file handling coding and revised parsing coding
+	xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ);
+	if(xmlHandle>=0)
+	   {
+	   int size = FileSize(xmlHandle);
+	   sData = FileReadString(xmlHandle, size);	
+	   FileClose(xmlHandle);
+	   }
 
-//else if (!StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank")
-else if ((!Bank_Holiday_On) && (StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank"))
-{skip = true;}
+	//Clear prioritization data
+	BankIdx1   = 0; 
+	FLAG_done0 = false; 
+   FLAG_done1 = false;  
+   FLAG_done2 = false;
+   FLAG_done3 = false;
+   FLAG_none0 = false;    
+   FLAG_none1 = false; 
+   FLAG_none2 = false;
+   FLAG_none3 = false;  
+	for (i=0; i<=9; i++)
+	   {
+	   dispTitle[i]   = "";
+	   dispCountry[i] = "";
+	   dispImpact[i] 	= "";
+	   dispMinutes[i]	= 0;	
+      }
 
-else if (!StringSubstr(mainData[newsIdx][TITLE],0,8)== "Daylight")
-{skip = true;}    	
+	//Parse the XML file looking for an event to report		
+	newsIdx = 0;
+	nextNewsIdx = -1;	
+	tmpMins = 10080;	// (a week)
+	BoEvent = 0;
+	while (true)
+   	{
+		BoEvent = StringFind(sData, "<event>", BoEvent);
+		if (BoEvent == -1) break;			
+		BoEvent += 7;	
+		next = StringFind(sData, "</event>", BoEvent);
+		if (next == -1) break;	
+		myEvent = StringSubstr(sData, BoEvent, next - BoEvent);
+		BoEvent = next;		
+		begin = 0;
+		skip = false;
+		for (i=0; i < 7; i++)
+		   {
+			mainData[newsIdx][i] = "";
+			next = StringFind(myEvent, sTags[i], begin);			
+			// Within this event, if tag not found, then it must be missing; skip it
+			if (next == -1) continue;
+			else
+			   {
+				// We must have found the sTag okay...
+				begin = next + StringLen(sTags[i]);		   	// Advance past the start tag
+				end = StringFind(myEvent, eTags[i], begin);	// Find start of end tag
+				//Get data between start and end tag
+				if (end > begin && end != -1) 
+				   {mainData[newsIdx][i] = StringSubstr(myEvent, begin, end - begin);}
+			   }
+		   }//End "for" loop
+	
+		//Test against filters that define whether we want to skip this particular announcement
+		if(!IsNewsCurrency(Symbol(),mainData[newsIdx][COUNTRY]))	//deVries
+			{skip = true;}	
 
-else if ((mainData[newsIdx][TIME] == "All Day" && mainData[newsIdx][TIME] == "") || 
-(mainData[newsIdx][TIME] == "Tentative" && mainData[newsIdx][TIME] == "")     ||
-(mainData[newsIdx][TIME] == ""))
-{skip = true;}			  	
+		else if ((!Medium_Impact_News_On) && 
+		   (mainData[newsIdx][IMPACT] == "Medium"))
+		   {skip = true;} 
+		   														   
+		else if ((!Low_Impact_News_On) && 
+		   (mainData[newsIdx][IMPACT] == "Low"))
+		   {skip = true;} 
 
-//If not skipping this event, then log time to event it into ExtMapBuffer0
-if (!skip)
-{   
-//If we got this far then we need to calc the minutes until this event
-//First, convert the announcement time to seconds (in GMT)
-newsTime = MakeDateTime(mainData[newsIdx][DATE], mainData[newsIdx][TIME]);			
-// Now calculate the minutes until this announcement (may be negative)
-minsTillNews = (newsTime - TimeGMT()) / 60;
-
-//If this is a Bank Holiday current or past event, 
-//then skip it by changing time to 2 days back
-if ((StringFind(mainData[newsIdx][TITLE], "Bank Holiday", 
-StringLen(mainData[newsIdx][TITLE])-12) != -1) && (minsTillNews <= 0))
-{
-minsTillNews = minsTillNews - 2880;
-}
-
-//At this point, only events applicable to the pair ID/Symbol are being processed:
-//Find the most recent past event.  Do this by incrementing idxOfNext for each event 
-//with a past time, (i.e. minsTillNews < 0).  When coming upon the first event with 
-//minsTillNews > 0, idxOfNext is not incremented, and therefore continues to be for 
-//the most recent past event.  It does not get incremented again until the absolute 
-//value of the time since this most recent past event exceeds the time to the next
-//future event.
-
-if (minsTillNews < 0 || MathAbs(tmpMins) > minsTillNews)	
-{idxOfNext = newsIdx; tmpMins	= minsTillNews;}	
-
-//Do alert if user has enabled
-if (Alert_Minutes_Before != 0 && minsTillNews == Alert_Minutes_Before)
-Alert(Alert_Minutes_Before, " minutes until news for ", 
-mainData[newsIdx][COUNTRY], ": ", mainData[newsIdx][TITLE]);
-
-//ExtMapBuffer0 contains the time UNTIL each announcement (can be negative)
-//e.g. [0] = -372; [1] = 25; [2] = 450; [3] = 1768 (etc.)
-ExtMapBuffer0[newsIdx] = minsTillNews;
-
-newsIdx++;
-}//End "skip" routine
-}//End "while" routine
-
+		//else if (!StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank")
+		else if ((!Bank_Holiday_On) && (StringSubstr(mainData[newsIdx][TITLE],0,4)== "Bank"))
+		    {skip = true;}
+		    
+		else if (!StringSubstr(mainData[newsIdx][TITLE],0,8)== "Daylight")
+		    {skip = true;}    	
+			
+   	else if ((mainData[newsIdx][TIME] == "All Day" && mainData[newsIdx][TIME] == "") || 
+		   (mainData[newsIdx][TIME] == "Tentative" && mainData[newsIdx][TIME] == "")     ||
+		  	(mainData[newsIdx][TIME] == ""))
+		  	{skip = true;}			  	
+		    				  	 				  	 
+		//If not skipping this event, then log time to event it into ExtMapBuffer0
+		if (!skip)
+		   {   
+			//If we got this far then we need to calc the minutes until this event
+			//First, convert the announcement time to seconds (in GMT)
+			newsTime = MakeDateTime(mainData[newsIdx][DATE], mainData[newsIdx][TIME]);			
+			// Now calculate the minutes until this announcement (may be negative)
+			minsTillNews = (newsTime - TimeGMT()) / 60;
+			
+         //If this is a Bank Holiday current or past event, 
+         //then skip it by changing time to 2 days back
+         if ((StringFind(mainData[newsIdx][TITLE], "Bank Holiday", 
+            StringLen(mainData[newsIdx][TITLE])-12) != -1) && (minsTillNews <= 0))
+            {
+            minsTillNews = minsTillNews - 2880;
+            }
+            
+			//At this point, only events applicable to the pair ID/Symbol are being processed:
+			//Find the most recent past event.  Do this by incrementing idxOfNext for each event 
+			//with a past time, (i.e. minsTillNews < 0).  When coming upon the first event with 
+			//minsTillNews > 0, idxOfNext is not incremented, and therefore continues to be for 
+			//the most recent past event.  It does not get incremented again until the absolute 
+			//value of the time since this most recent past event exceeds the time to the next
+			//future event.
+			
+			if (minsTillNews < 0 || MathAbs(tmpMins) > minsTillNews)	
+			   {idxOfNext = newsIdx; tmpMins	= minsTillNews;}	
+						
+			//Do alert if user has enabled
+			if (Alert_Minutes_Before != 0 && minsTillNews == Alert_Minutes_Before)
+				Alert(Alert_Minutes_Before, " minutes until news for ", 
+				mainData[newsIdx][COUNTRY], ": ", mainData[newsIdx][TITLE]);
+						
+			//ExtMapBuffer0 contains the time UNTIL each announcement (can be negative)
+			//e.g. [0] = -372; [1] = 25; [2] = 450; [3] = 1768 (etc.)
+			ExtMapBuffer0[newsIdx] = minsTillNews;
+			
+			newsIdx++;
+		   }//End "skip" routine
+	   }//End "while" routine
+	   
 	//----------------------------------------------------------------------------------------------
 	//Prioritization coding:  Cycle thru the range of "newsIdx" prioritizing events for display.
 	for (i=0; i < newsIdx; i++)
@@ -733,42 +738,45 @@ newsIdx++;
 //| Subroutines: recoded creation and maintenance of single xml file                              |
 //+-----------------------------------------------------------------------------------------------+   
 //deVries: void InitNews(string& mainData[][], string newsUrl)
-void InitNews(string newsUrl)
-   {
-   if(DoFileDownLoad()) //Added to check if the CSV file already exists
-      {
-      DownLoadWebPageToFile(newsUrl); //downloading the xml file
-      } 
-   }
+void InitNews(string newsUrl) {
+  if(DoFileDownLoad()) { //Added to check if the CSV file already exists
+    DownLoadWebPageToFile(newsUrl); //downloading the xml file
+  } 
+}
 
-//deVries: If we have recent file don't download again
-bool DoFileDownLoad()  
-   {
-   xmlHandle = 0;
-   int size;
-   datetime time = TimeCurrent();
-   //datetime time = TimeLocal();
-   
-   if(GlobalVariableCheck("Update.FF_Cal") == false)return(true);
-   if((time - GlobalVariableGet("Update.FF_Cal")) > WebUpdateFreq*60)return(true);
-    
-   xmlFileName = GetXmlFileName();
-   xmlHandle=FileOpen(xmlFileName,FILE_BIN|FILE_READ);  //check if file exist 
-   if(xmlHandle>=0)//when the file exists we read data
-      {
-	   size = FileSize(xmlHandle); 
-	   sData = FileReadString(xmlHandle, size);	  
-      FileClose(xmlHandle);//close it again check is done
-      return(false);//file exists no need to download again
-      }
-   //File does not exist if FileOpen return -1 or if GetLastError = ERR_CANNOT_OPEN_FILE (4103)
-   return(true); //commando true to download xml file     
-   } 
+// deVries: If we have recent file don't download again
+bool DoFileDownLoad() {
+  xmlHandle = 0;
+  int size;
+  datetime time = TimeCurrent();
   
-//+----------------------------------------------------------------------------+
-//| Subroutine: getting the name of the ForexFactory .xml file                 |
-//+----------------------------------------------------------------------------+
-//deVries: one file for all charts!   
+  if(GlobalVariableCheck("Update.FF_Cal") == false) {
+    return(true);
+  }
+  if((time - GlobalVariableGet("Update.FF_Cal")) > WebUpdateFreq*60) {
+    return(true);
+  }
+  
+  xmlFileName = GetXmlFileName();
+  //check if file exist 
+  xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ);  
+  // when the file exists we read data
+  if(xmlHandle>=0) {
+    size = FileSize(xmlHandle); 
+    sData = FileReadString(xmlHandle, size);
+    // close it again check is done
+    FileClose(xmlHandle); 
+    // file exists no need to download again
+    return(false);
+  }
+  // File does not exist if FileOpen return -1 or if GetLastError = ERR_CANNOT_OPEN_FILE (4103)
+  return(true); // commando true to download xml file     
+} 
+  
+//+-----------------------------------------------------------------------------------------------+
+//| Subroutine: getting the name of the ForexFactory .xml file                                    |
+//+-----------------------------------------------------------------------------------------------+ 
+// deVries: one file for all charts!   
 string GetXmlFileName() {
   int adjustDays = 0;
   switch(TimeDayOfWeek(TimeLocal())) {
@@ -794,72 +802,82 @@ string GetXmlFileName() {
     adjustDays = 6;
     break;
   } 
-  calendardate = TimeLocal() - (adjustDays  * 86400);
-  string fileName = (StringConcatenate(TimeYear(calendardate),"-",
-         PadString(DoubleToStr(TimeMonth(calendardate),0),"0",2),"-",
-         PadString(DoubleToStr(TimeDay(calendardate),0),"0",2),"-FFCal-News",".xml"));
-  return (fileName); //Always a Sunday date  		
+  calendardate = TimeLocal() - (adjustDays * 86400);
+  string fileName = (StringConcatenate(TimeYear(calendardate), 
+    "-",
+    PadString(DoubleToStr(TimeMonth(calendardate),0),"0",2), 
+    "-",
+    PadString(DoubleToStr(TimeDay(calendardate),0),"0",2), 
+    "-FFCal-News",
+    ".xml"));
+  
+  return (fileName); // Always a Sunday date  		
 }
   
 //+-----------------------------------------------------------------------------------------------+
 //| Subroutine: downloading the ForexFactory .xml file                                            |
 //+-----------------------------------------------------------------------------------------------+    
 //deVries: new coding replacing old "GrabWeb" coding
-void DownLoadWebPageToFile(string url = "http://www.forexfactory.com/ff_calendar_thisweek.xml") 
-   {
-   int HttpOpen = InternetOpenW(" ", 0, " ", " ", 0); 
-   int HttpConnect = InternetConnectW(HttpOpen, "", 80, "", "", 3, 0, 1); 
-   int HttpRequest = InternetOpenUrlW(HttpOpen, url, NULL, 0, 0, 0);
-
-   int read[1];
-   uchar  Buffer[];
-   ArrayResize(Buffer, READURL_BUFFER_SIZE + 1);
-   string NEWS = "";
-   
-	   xmlFileName = GetXmlFileName();
-	   xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ|FILE_WRITE);
-	   //File exists if FileOpen return >=0. 
-	   if (xmlHandle >= 0) {FileClose(xmlHandle); FileDelete(xmlFileName);}	
-   	
-		//Open new XML.  Write the ForexFactory page contents to a .htm file.  Close new XML.
-		xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_WRITE);   
-      
-   while (true)
-      {
-      InternetReadFile(HttpRequest, Buffer, READURL_BUFFER_SIZE, read);      
-      string strThisRead = CharArrayToString(Buffer, 0, read[0], CP_UTF8);
-      if (read[0] > 0)NEWS = NEWS + strThisRead;
-      else
-         {
-         FileWriteString(xmlHandle, NEWS);
-         FileClose(xmlHandle);
-		   //Find the XML end tag to ensure a complete page was downloaded.
-		   end = StringFind(NEWS, "</weeklyevents>", 0);
-		   //If the end of file tag is not found, a return -1 (or, "end <=0" in this case), 
-		   //then return (false).
-		   if (end == -1) {Alert(Symbol()," ",Period(),", FFCal Error: File download incomplete!");}
-		   //Else, set global to time of last update
-		   else {GlobalVariableSet("Update.FF_Cal", TimeCurrent());}             
-         break;
-         }      
-      }				
-   if (HttpRequest > 0) InternetCloseHandle(HttpRequest); 
-   if (HttpConnect > 0) InternetCloseHandle(HttpConnect); 
-   if (HttpOpen > 0) InternetCloseHandle(HttpOpen);      
-   }
+void DownLoadWebPageToFile(string url) {
+  // url = "http://www.forexfactory.com/ff_calendar_thisweek.xml"; 
+  int HttpOpen = InternetOpenW(" ", 0, " ", " ", 0); 
+  int HttpConnect = InternetConnectW(HttpOpen, "", 80, "", "", 3, 0, 1); 
+  int HttpRequest = InternetOpenUrlW(HttpOpen, url, NULL, 0, 0, 0);
+  
+  int read[1];
+  uchar  Buffer[];
+  ArrayResize(Buffer, READURL_BUFFER_SIZE + 1);
+  string NEWS = "";
+  
+  xmlFileName = GetXmlFileName();
+  xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ|FILE_WRITE);
+  // File exists if FileOpen return >=0. 
+  if (xmlHandle >= 0) {
+    FileClose(xmlHandle); 
+    FileDelete(xmlFileName);
+  }	
+  
+  // Open new XML. Write the ForexFactory page contents to a .htm file. 
+  // Close new XML.
+  xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_WRITE);   
+  while (true) {
+    InternetReadFile(HttpRequest, Buffer, READURL_BUFFER_SIZE, read);      
+    string strThisRead = CharArrayToString(Buffer, 0, read[0], CP_UTF8);
+    if (read[0] > 0) {
+      NEWS = NEWS + strThisRead;
+    } else {
+      FileWriteString(xmlHandle, NEWS);
+      FileClose(xmlHandle);
+      // Find the XML end tag to ensure a complete page was downloaded.
+      if (StringFind(NEWS, "</weeklyevents>", 0) == -1) {
+        Alert(Symbol()," ",Period(),", FFCal Error: File download incomplete!");
+      } else {
+        GlobalVariableSet("Update.FF_Cal", TimeCurrent());
+      }             
+      break;
+    }      
+  }				
+  if (HttpRequest > 0) {
+    InternetCloseHandle(HttpRequest); 
+  }
+  if (HttpConnect > 0) {
+    InternetCloseHandle(HttpConnect); 
+  }
+  if (HttpOpen > 0) {
+    InternetCloseHandle(HttpOpen);
+  }
+}
    
 //+-----------------------------------------------------------------------------------------------+
 //| Subroutine: to pad string                                                                     |
 //+-----------------------------------------------------------------------------------------------+ 
 //deVries: 
-string PadString(string toBePadded, string paddingChar, int paddingLength)
-   {
-   while(StringLen(toBePadded) <  paddingLength)
-      {
-      toBePadded = StringConcatenate(paddingChar,toBePadded);
-      }
-   return (toBePadded);
-   }
+string PadString(string toBePadded, string paddingChar, int paddingLength) {
+  while(StringLen(toBePadded) <  paddingLength) {
+    toBePadded = StringConcatenate(paddingChar,toBePadded);
+  }
+  return (toBePadded);
+}
    
 //+-----------------------------------------------------------------------------------------------+
 //| Subroutine: to ID currency even if broker has added a prefix to the symbol, and is used to    |
@@ -868,20 +886,40 @@ string PadString(string toBePadded, string paddingChar, int paddingLength)
 //deVries: works even when broker has attached prefix (or suffix) to the Currency, so that the
 //symbol format does not look like the standard example EURUSD or USDJPY.
 //atstrader: adds option to ignore the chart symbol pair and re-select other(s). 
-bool IsNewsCurrency(string cSymbol, string fSymbol)
-   {
-   if(!Ignore_Current_Symbol && (StringFind(cSymbol, fSymbol, 0)>=0)){return(true);}
-   if(Show_USD_News && fSymbol == "USD"){return(true);}
-   if(Show_GBP_News && fSymbol == "GBP"){return(true);}
-   if(Show_EUR_News && fSymbol == "EUR"){return(true);}   
-   if(Show_CAD_News && fSymbol == "CAD"){return(true);}
-   if(Show_AUD_News && fSymbol == "AUD"){return(true);}   
-   if(Show_CHF_News && fSymbol == "CHF"){return(true);}   
-   if(Show_JPY_News && fSymbol == "JPY"){return(true);}   
-   if(Show_NZD_News && fSymbol == "NZD"){return(true);}         
-   if(Show_CNY_News && fSymbol == "CNY"){return(true);}
-   return(false);
-   } 
+bool IsNewsCurrency(string cSymbol, string fSymbol) {
+  if(!Ignore_Current_Symbol 
+    && (StringFind(cSymbol, fSymbol, 0)>=0)) {
+    return(true);
+  }
+  if(Show_USD_News && fSymbol == "USD") {
+    return(true);
+  }
+  if(Show_GBP_News && fSymbol == "GBP") {
+    return(true);
+  }
+  if(Show_EUR_News && fSymbol == "EUR") {
+    return(true);
+  }   
+  if(Show_CAD_News && fSymbol == "CAD") {
+    return(true);
+  }
+  if(Show_AUD_News && fSymbol == "AUD") {
+    return(true);
+  }   
+  if(Show_CHF_News && fSymbol == "CHF") {
+    return(true);
+  }   
+  if(Show_JPY_News && fSymbol == "JPY") {
+    return(true);
+  }   
+  if(Show_NZD_News && fSymbol == "NZD") {
+    return(true);
+  }         
+  if(Show_CNY_News && fSymbol == "CNY") {
+    return(true);
+  }
+  return(false);
+} 
 
 //+-----------------------------------------------------------------------------------------------+
 //| Indicator Routine For Normal Display                                                          |
@@ -1138,41 +1176,56 @@ void OutputToChart()
 //+-----------------------------------------------------------------------------------------------+
 //| Indicator Subroutine For Impact Color                                                         |
 //+-----------------------------------------------------------------------------------------------+  
-double ImpactToColor (string impact)
-   {
-	if (impact == "High") return (High_Impact_News_Color);
-	else {if (impact == "Medium") return (Medium_Impact_News_Color);
-	else {if (impact == "Low") return (Low_Impact_News_Color);
-	else {if (impact == "Holiday") return (Bank_Holiday_Color); 
-	else {return (Remarks_Color);} }}}  
-   }
+double ImpactToColor (string impact) {
+  if (impact == "High") {
+    return (High_Impact_News_Color);
+  } else {
+    if (impact == "Medium") {
+      return (Medium_Impact_News_Color);
+    } else {
+      if (impact == "Low") {
+        return (Low_Impact_News_Color);
+      } else {
+        if (impact == "Holiday") {
+          return (Bank_Holiday_Color); 
+        } else {
+          return (Remarks_Color);
+        } 
+      }
+    }
+  }  
+}
 
 //+-----------------------------------------------------------------------------------------------+
 //| Indicator Subroutine For Date/Time    changed by deVries                                      |
 //+-----------------------------------------------------------------------------------------------+ 
-datetime MakeDateTime(string strDate, string strTime)  //not string now datetime
-   {
-	int n1stDash = StringFind(strDate, "-");
-	int n2ndDash = StringFind(strDate, "-", n1stDash+1);
-
-	string strMonth = StringSubstr(strDate, 0, 2);
-	string strDay = StringSubstr(strDate, 3, 2);
-	string strYear = StringSubstr(strDate, 6, 4); 
-   //strYear = "20" + strYear;
-	
-	int nTimeColonPos = StringFind(strTime, ":");
-	string strHour = StringSubstr(strTime, 0, nTimeColonPos);
-	string strMinute = StringSubstr(strTime, nTimeColonPos+1, 2);
-	string strAM_PM = StringSubstr(strTime, StringLen(strTime)-2);
-
-	int nHour24 = StrToInteger(strHour);
-	if ((strAM_PM == "pm" || strAM_PM == "PM") && nHour24 != 12) {nHour24 += 12;}
-	if ((strAM_PM == "am" || strAM_PM == "AM") && nHour24 == 12) {nHour24 = 0;}
-
-	datetime newsevent = StringToTime(strYear+ "." + strMonth + "." + 
-	   strDay)+nHour24*3600+ (StringToInteger(strMinute)*60);
-	return(newsevent);
-   }
+datetime MakeDateTime(string strDate, string strTime) { //not string now datetime
+  int n1stDash = StringFind(strDate, "-");
+  int n2ndDash = StringFind(strDate, "-", n1stDash+1);
+  
+  // get ymd
+  string strMonth = StringSubstr(strDate, 0, 2);
+  string strDay = StringSubstr(strDate, 3, 2);
+  string strYear = StringSubstr(strDate, 6, 4); 
+  
+  // get hhmm
+  int nTimeColonPos = StringFind(strTime, ":");
+  string strHour = StringSubstr(strTime, 0, nTimeColonPos);
+  string strMinute = StringSubstr(strTime, nTimeColonPos+1, 2);
+  string strAM_PM = StringSubstr(strTime, StringLen(strTime)-2);
+  
+  int nHour24 = StrToInteger(strHour);
+  if ((strAM_PM == "pm" || strAM_PM == "PM") && nHour24 != 12) {
+    nHour24 += 12;
+  }
+  if ((strAM_PM == "am" || strAM_PM == "AM") && nHour24 == 12) {
+    nHour24 = 0;
+  }
+  
+  datetime newsevent = StringToTime(strYear + "." + strMonth + "." + strDay) 
+                       + nHour24*3600 + (StringToInteger(strMinute)*60);
+  return(newsevent);
+}
 
 //+-----------------------------------------------------------------------------------------------+
 //| Indicator End                                                                                 |                                                        

@@ -284,67 +284,64 @@ int deinit() {
 //| Indicator Start                                                            |
 //+----------------------------------------------------------------------------+
 int start() {
-   //If Indicator is "Off" or chart is out of range deinitialize only once, not every tick.
+  /* If Indicator is "Off" or chart is out of range deinitialize only once, 
+  not every tick.*/
   if((!Indicator_On) 
     || ((Period() < Display_Min_TF) 
     || (Period() > Display_Max_TF))) {
-      if (!Deinitialized)  {
-		deinit(); 
-		Deinitialized = true;
+      if (!Deinitialized) {
+        deinit(); 
+        Deinitialized = true;
     }
     //deleting old versions xml file 
     return(0);
   }    
 
-   InitNews(sUrl);
+  InitNews(sUrl);
 
-	//qFish-----------------------------------------------------------------------------------------
-	//Perform remaining checks once per UpdateRateSec (Refreshing News from XML file)
-   if(PrevTF==Period())  
-      {
-      //if we haven't changed time frame then keep doing what we are doing
-      if(MathMod(Seconds(),UpdateRateSec)==0)
-         {
-         return (true);
-         }
-      //otherwise, we've switched time frame and do not need to skip every 10 s,
-      //thus immediately execute all of the start() function code   
-      else   
-         {
-         PrevTF = Period();
-         }
-      }
+  /* qFish----------------------------------------------------------------------
+  Perform remaining checks once per UpdateRateSec 
+  (Refreshing News from XML file) */
+  if(PrevTF == Period()) {
+    //if we haven't changed time frame then keep doing what we are doing
+    if(MathMod(Seconds(), UpdateRateSec) == 0) {
+      return (true);
+    }
+    // otherwise, we've switched time frame and do not need to skip every 10 s,
+    // thus immediately execute all of the start() function code   
+    else {
+      PrevTF = Period();
+    }
+  }
 
-	//Init the buffer array to zero just in case
-	ArrayInitialize(ExtMapBuffer0, 0);
+  //Init the buffer array to zero just in case
+  ArrayInitialize(ExtMapBuffer0, 0);
 	
-	//deVries---------------------------------------------------------------------------------------
-	//New xml file handling coding and revised parsing coding
-	xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ);
-	if(xmlHandle>=0)
-	   {
-	   int size = FileSize(xmlHandle);
-	   sData = FileReadString(xmlHandle, size);	
-	   FileClose(xmlHandle);
-	   }
+  // deVries--------------------------------------------------------------------
+  // New xml file handling coding and revised parsing coding
+  xmlHandle = FileOpen(xmlFileName, FILE_BIN|FILE_READ);
+  if(xmlHandle >= 0) {
+    int size = FileSize(xmlHandle);
+    sData = FileReadString(xmlHandle, size);	
+    FileClose(xmlHandle);
+  }
 
 	//Clear prioritization data
-	BankIdx1   = 0; 
-	FLAG_done0 = false; 
-   FLAG_done1 = false;  
-   FLAG_done2 = false;
-   FLAG_done3 = false;
-   FLAG_none0 = false;    
-   FLAG_none1 = false; 
-   FLAG_none2 = false;
-   FLAG_none3 = false;  
-	for (i=0; i<=9; i++)
-	   {
-	   dispTitle[i]   = "";
-	   dispCountry[i] = "";
-	   dispImpact[i] 	= "";
-	   dispMinutes[i]	= 0;	
-      }
+  BankIdx1   = 0; 
+  FLAG_done0 = false; 
+  FLAG_done1 = false;  
+  FLAG_done2 = false;
+  FLAG_done3 = false;
+  FLAG_none0 = false;    
+  FLAG_none1 = false; 
+  FLAG_none2 = false;
+  FLAG_none3 = false;  
+  for (i=0; i<=9; i++) {
+    dispTitle[i]   = "";
+    dispCountry[i] = "";
+    dispImpact[i] 	= "";
+    dispMinutes[i]	= 0;	
+  }
 
 	//Parse the XML file looking for an event to report		
 	newsIdx = 0;

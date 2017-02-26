@@ -87,10 +87,10 @@ clDat = clDat(dim:end);
 % 校验 0:无趋势 1:上升 2:下降
 % 此处向后延一个点
 % 不算点trainLen
-len = len - 1;
-verify = zeros(1,len);
-del = (clDat(2:end)-clDat(1:end-1));
-for i=1:len
+delayPos = 10;
+del = (clDat(delayPos+1:end)-clDat(1:end-delayPos));
+verify = zeros(1,length(del));
+for i=1:length(verify)
     if del(i) > 0
         verify(i) = 1;
     elseif del(i) < 0
@@ -101,7 +101,7 @@ for i=1:len
 end
 
 % 因此输入需要对齐校验数据-1个点
-trainData = trainData(1:end-1,1:end,1:end);
+trainData = trainData(1:end-delayPos,1:end,1:end);
 verifyLen = length(verify);
 fprintf('校验数据长度:%d\n', verifyLen);
 

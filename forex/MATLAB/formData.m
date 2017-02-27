@@ -46,7 +46,7 @@ test_l    = L(trainLen+1:trainLen+testLen);
 test_c    = C(trainLen+1:trainLen+testLen);
 test_v    = V(trainLen+1:trainLen+testLen);
 
-%% clear nouse data
+%% clear no use data
 clear YMD HHMM O H L C V;
 clear YMD2003 HHMM2003 O2003 H2003 L2003 C2003 V2003;
 clear YMD2004 HHMM2004 O2004 H2004 L2004 C2004 V2004;
@@ -61,47 +61,64 @@ clear YMD2012 HHMM2012 O2012 H2012 L2012 C2012 V2012;
 clear YMD2013 HHMM2013 O2013 H2013 L2013 C2013 V2013;
 clear YMD2014 HHMM2014 O2014 H2014 L2014 C2014 V2014;
 
+tptr = 'sqtwolog';
+sorh = 's';
+% scal = 'sln';
+% wname = 'sym8';
+scal = 'mln';
+wname = 'sym4';
+lev = 5;
+
 %% Train FFT
 filtPercent=0.8;
 fftFiltLen = round(filtPercent*trainLen);
 fftFiltRange = round((trainLen-fftFiltLen)/2) : ...
                round(trainLen-(trainLen-fftFiltLen)/2);
-fftTmp = fft(train_o);
-fftTmp(fftFiltRange)=0;
-train_o = real(ifft(fftTmp));
+% fftTmp = fft(train_o);
+% fftTmp(fftFiltRange)=0;
+% train_o = real(ifft(fftTmp));
+train_o=wden(train_o,tptr,sorh,scal,lev,wname); 
 
-fftTmp = fft(train_h);
-fftTmp(fftFiltRange)=0;
-train_h = real(ifft(fftTmp));
+% fftTmp = fft(train_h);
+% fftTmp(fftFiltRange)=0;
+% train_h = real(ifft(fftTmp));
+train_h=wden(train_h,tptr,sorh,scal,lev,wname); 
 
-fftTmp = fft(train_l);
-fftTmp(fftFiltRange)=0;
-train_l = real(ifft(fftTmp));
+% fftTmp = fft(train_l);
+% fftTmp(fftFiltRange)=0;
+% train_l = real(ifft(fftTmp));
+train_l=wden(train_l,tptr,sorh,scal,lev,wname); 
 
-fftTmp = fft(train_c);
-fftTmp(fftFiltRange)=0;
-train_c = real(ifft(fftTmp));
+% fftTmp = fft(train_c);
+% fftTmp(fftFiltRange)=0;
+% train_c = real(ifft(fftTmp));
+train_c=wden(train_c,tptr,sorh,scal,lev,wname); 
 
 %% Test FFT
 filtPercent=0.8;
 fftFiltLen = round(filtPercent*testLen);
 fftFiltRange = round((testLen-fftFiltLen)/2) : ...
                round(testLen-(testLen-fftFiltLen)/2);
-fftTmp = fft(test_o);
-fftTmp(fftFiltRange)=0;
-test_o = real(ifft(fftTmp));
+           
+% fftTmp = fft(test_o);
+% fftTmp(fftFiltRange)=0;
+% test_o = real(ifft(fftTmp));
+test_o=wden(test_o,tptr,sorh,scal,lev,wname); 
 
-fftTmp = fft(test_h);
-fftTmp(fftFiltRange)=0;
-test_h = real(ifft(fftTmp));
+% fftTmp = fft(test_h);
+% fftTmp(fftFiltRange)=0;
+% test_h = real(ifft(fftTmp));
+test_h=wden(test_h,tptr,sorh,scal,lev,wname); 
 
-fftTmp = fft(test_l);
-fftTmp(fftFiltRange)=0;
-test_l = real(ifft(fftTmp));
+% fftTmp = fft(test_l);
+% fftTmp(fftFiltRange)=0;
+% test_l = real(ifft(fftTmp));
+test_l=wden(test_l,tptr,sorh,scal,lev,wname); 
 
-fftTmp = fft(test_c);
-fftTmp(fftFiltRange)=0;
-test_c = real(ifft(fftTmp));
+% fftTmp = fft(test_c);
+% fftTmp(fftFiltRange)=0;
+% test_c = real(ifft(fftTmp));
+test_c=wden(test_c,tptr,sorh,scal,lev,wname); 
 
 %% 去除小数部分
 train_o = train_o * 100000;

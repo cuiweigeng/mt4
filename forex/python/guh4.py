@@ -166,7 +166,7 @@ def read_data(train_dir,
 
 #pdb.set_trace() 
 # print(mnist.train.labels[0])
-mnist = read_data("/Users/ivan/Desktop/mt4-master/forex/MATLAB/", one_hot=True) 
+mnist = read_data("/Users/Administrator/Desktop/git/forex/MATLAB/", one_hot=True) 
 
 '''
 To classify images using a recurrent neural network, we consider every image

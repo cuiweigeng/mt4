@@ -96,91 +96,90 @@ lev = 5;
 
 %% define indicator param
 PRD = 20;
-dim = 6;
+
 
 %% train Wavelet
-seqStart = 1024;
-trainData = zeros(trainLen-dim-seqStart+1, dim, dim);
-valid = zeros(trainLen-dim-seqStart+1, 1);
+winLen = 1024;
+prvLen = 6;
+trainData = zeros(trainLen-prvLen-winLen+1, prvLen, prvLen);
+verifyData = zeros(trainLen-prvLen-winLen+1, 1);
 fidTrain=fopen('trainImages', 'wb','ieee-be'); %´ó¶Ë
 fidVerify=fopen('trainLabels','wb','ieee-be');
-fwrite(fidTrain, verifyLen, 'uint');
-fwrite(fidVerify, verifyLen, 'uint');
+fwrite(fidTrain, trainLen-prvLen-winLen+1, 'uint');
+fwrite(fidVerify, trainLen-prvLen-winLen+1, 'uint');
 
 tic
-for i=seqStart:trainLen-dim
-    %% time start at seqStart
-    tmpLen = length(1:i);
-    tmpO = wden(train_o(1:i), tptr, sorh, scal, lev, wname) * 100000; 
-    tmpH = wden(train_h(1:i), tptr, sorh, scal, lev, wname) * 100000; 
-    tmpL = wden(train_l(1:i), tptr, sorh, scal, lev, wname) * 100000; 
-    tmpC = wden(train_c(1:i), tptr, sorh, scal, lev, wname) * 100000; 
+for i=1:trainLen-prvLen-winLen
+    %% time start at winLen
+    tmpLen = length(1:i+winLen-1);
+%     tmpO = wden(train_o(1:tmpLen), tptr, sorh, scal, lev, wname) * 100000; 
+    tmpH = wden(train_h(1:tmpLen), tptr, sorh, scal, lev, wname) * 100000; 
+    tmpL = wden(train_l(1:tmpLen), tptr, sorh, scal, lev, wname) * 100000; 
+    tmpC = wden(train_c(1:tmpLen), tptr, sorh, scal, lev, wname) * 100000; 
     
     %% ma
-    fprintf('calc MA\n');
-    maO = ma(tmpC, tmpLen, PRD);
+    maH = ma(tmpH, tmpLen, PRD);
+    maL = ma(tmpL, tmpLen, PRD);
+    maC = ma(tmpC, tmpLen, PRD);
 
     %% rsi
-    fprintf('calc RSI\n');
     rsiC = rsindex(tmpC, PRD);
     rsiC(1:PRD) = rsiC(PRD+1);
     
     %% STOCH
-    fprintf('calc stoch\n');
     stochC = stoch(tmpC, tmpLen, PRD);
 
     %% BB
-    fprintf('calc bollinger\n');
     [mid, uppr, lowr] = bollinger(tmpC, PRD, 0, 2.0);
     uppr(1:PRD-1) = uppr(PRD); % fill
     lowr(1:PRD-1) = lowr(PRD);
     
     %% Çócci
-    fprintf('calc CCI\n');
     cciC = indicators([tmpH, tmpL, tmpC], 'cci' ,PRD, PRD, 0.015);
     cciC(1:PRD-1) = cciC(PRD);
     
-    %% remove PRD, time start at (seqStart+PRD)
-    tmpH = tmpH(PRD + 1:end);
-    tmpL = tmpL(PRD + 1:end);
-    tmpC = tmpC(PRD + 1:end);
+    %% remove PRD, time start at (winLen+PRD)
+    maH = maH(PRD + 1:end);
+    maL = maL(PRD + 1:end);
+    maC = maC(PRD + 1:end);
     uppr = uppr(PRD + 1:end);
     lowr = lowr(PRD + 1:end);
     stochC = stochC(PRD + 1:end);
     rsiC = rsiC(PRD + 1:end);
     cciC = cciC(PRD + 1:end);
     
-    %% train data
-    trainData(i-seqStart+1, 3, :) = normalization(tmpC(end-dim+1:end));
-    trainData(i-seqStart+1, 4, :) = normalization(uppr(end-dim+1:end));
-    trainData(i-seqStart+1, 5, :) = normalization(lowr(end-dim+1:end));
-    trainData(i-seqStart+1, 6, :) = normalization(stochC(end-dim+1:end));
-    trainData(i-seqStart+1, 1, :) = normalization(rsiC(end-dim+1:end));
-    trainData(i-seqStart+1, 2, :) = normalization(cciC(end-dim+1:end));
+    %% get the last winLen ---> train data
+%     trainData(i, 1, :) = normalization(maH(end-prvLen+1:end));
+%     trainData(i, 2, :) = normalization(maL(end-prvLen+1:end));
+    trainData(i, 3, :) = normalization(maC(end-prvLen+1:end));
+    trainData(i, 4, :) = normalization(uppr(end-prvLen+1:end));
+    trainData(i, 5, :) = normalization(lowr(end-prvLen+1:end));
+    trainData(i, 6, :) = normalization(stochC(end-prvLen+1:end));
+    trainData(i, 1, :) = normalization(rsiC(end-prvLen+1:end));
+    trainData(i, 2, :) = normalization(cciC(end-prvLen+1:end));
     
     %% valid data
-    prvLen = 6;
-    prvC = wden(train_c(1:i+prvLen), tptr, sorh, scal, lev, wname) * 100000; 
+    prvC = wden(train_c(1:i+winLen+prvLen-1), tptr, sorh, scal, lev, wname) * 100000; 
     if prvC(end) - prvC(end-prvLen) > 0
-        valid(i-seqStart+1) = 1;
+        verifyData(i) = 1;
     elseif prvC(end) - prvC(end-prvLen) < 0
-        valid(i-seqStart+1) = 2;
+        verifyData(i) = 2;
     else
-        valid(i-seqStart+1) = 0;
+        verifyData(i) = 0;
     end
     
     %%
     for j=1:6
         for k=1:6
-            fwrite(fidTrain, trainData(i-seqStart+1, j, k), 'uint');
+            fwrite(fidTrain, trainData(i, j, k), 'uint');
         end
     end
-    fwrite(fidVerify, verify(i-seqStart+1), 'uchar');
+    fwrite(fidVerify, verifyData(i), 'uchar');
     
     %% info
-    if(rem(i,1000) == 0) 
+    if(rem(i,100) == 0) 
         toc
-        fprintf('proc matrix row = %d, total row = %d\n', i, matRow);
+        fprintf('proc num = %d, total num = %d\n', i, trainLen-prvLen-winLen);
         tic
     end
 end
@@ -191,11 +190,11 @@ fclose(fidVerify);
 
 %% 
 fprintf('export train data:\n');
-saveData(train_h, train_l, train_c, PRD, dim, trainLen, ...
+saveData(train_h, train_l, train_c, PRD, prvLen, trainLen, ...
          'trainImages', 'trainLabels');
 
 fprintf('export test data:\n');
-saveData(test_h, test_l, test_c, PRD, dim, testLen, ...
+saveData(test_h, test_l, test_c, PRD, prvLen, testLen, ...
          'testImages', 'testLabels');
 
 

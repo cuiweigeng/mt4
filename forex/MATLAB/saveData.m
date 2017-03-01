@@ -87,7 +87,7 @@ clDat = clDat(dim:end);
 % 校验 0:无趋势 1:上升 2:下降
 % 此处向后延一个点
 % 不算点trainLen
-delayPos = 6;
+delayPos = 50;
 del = (clDat(delayPos+1:end)-clDat(1:end-delayPos));
 verify = zeros(1,length(del));
 for i=1:length(verify)

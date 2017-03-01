@@ -147,16 +147,16 @@ def read_data(train_dir,
                    dtype=dtypes.float32,
                    reshape=True,
                    validation_size=5000):				   
-  with open(train_dir + 'trainImages', 'rb') as f:
+  with open(train_dir + 'trainImages_20', 'rb') as f:
     train_images = extract_images(f)
 
-  with open(train_dir + 'trainLabels', 'rb') as f:
+  with open(train_dir + 'trainLabels_20', 'rb') as f:
     train_labels = extract_labels(f, one_hot=one_hot)
 
-  with open(train_dir + 'testImages', 'rb') as f:
+  with open(train_dir + 'testImages_20', 'rb') as f:
     test_images = extract_images(f)
 
-  with open(train_dir + 'testLabels', 'rb') as f:
+  with open(train_dir + 'testLabels_20', 'rb') as f:
     test_labels = extract_labels(f, one_hot=one_hot)
 
   train = DataSet(train_images, train_labels, dtype=dtype, reshape=reshape)
@@ -177,7 +177,7 @@ handle 28 sequences of 28 steps for every sample.
 # Parameters
 learning_rate = 0.0005
 training_iters = 500000
-batch_size = 72
+batch_size = 288
 display_step = 100
 
 # Network Parameters

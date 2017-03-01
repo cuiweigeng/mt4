@@ -9,8 +9,8 @@ fwrite(fidTrain, len-lookForwardLen-waveletLen, 'uint');
 fwrite(fidVerify, len-lookForwardLen-waveletLen, 'uint');
 
 
- = wden(C, waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
-    waveletParam.lev, waveletParam.wname) * 100000; 
+% realCw = wden(C, waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
+%     waveletParam.lev, waveletParam.wname) * 100000; 
 
 % plot(C*100000,'k');hold on;plot(realCw,'r--');
 
@@ -35,12 +35,13 @@ for i=1:len-lookForwardLen-waveletLen
     %% indicator, calc 1/4, must > prd+dim
 %     maH = ma(tmpH, waveletLen, indPrd);
 %     maL = ma(tmpL, waveletLen, indPrd);
-    maC_ = ma(tmpC, waveletLen, indPrd);
     
-    cla;
-    plot(C(range)*100000,'k');hold on;
-    plot(tmpC,'b--');hold on;
-    plot(maC_,'r--');
+%     cla;
+%     tmpC = wden(C(1:waveletLen+i-1), waveletParam.tptr, waveletParam.sorh, ...
+%         waveletParam.scal, waveletParam.lev, waveletParam.wname) * 100000;
+%     plot(C(range)*100000,'k');hold on;
+%     plot(tmpC(range),'b*');hold on;
+%     plot(realCw(range),'r--');
     
     maH = indicators(tmpH(end-indCalcLen:end), 'sma', indPrd);
     maL = indicators(tmpL(end-indCalcLen:end), 'sma', indPrd);
@@ -78,6 +79,10 @@ for i=1:len-lookForwardLen-waveletLen
     trainData(i, 2, :) = normalization(cciC(end-dim+1:end));
     
     %% valid data
+    range(end)
+    realCw = wden(C, waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
+        waveletParam.lev, waveletParam.wname) * 100000; 
+
     lookForwardCw = realCw(range(end)+lookForwardLen);
     if lookForwardCw - realCw(range(end)) > 0
         verifyData(i) = 1;

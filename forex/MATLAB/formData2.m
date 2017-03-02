@@ -1,7 +1,7 @@
 close all;clear;clc;
 format bank;
 
-%% read and merge data
+%% read data
 [YMD2003, HHMM2003, O2003, H2003, L2003, C2003, V2003] ...
     = read_csv('GU_H1\GBPUSD_H1_2003.csv');
 [YMD2004, HHMM2004, O2004, H2004, L2004, C2004, V2004] ...
@@ -27,6 +27,7 @@ format bank;
 [YMD2014, HHMM2014, O2014, H2014, L2014, C2014, V2014] ...
     = read_csv('GU_H1\GBPUSD_H1_2014.csv');
 
+%% merge data
 YMD = [YMD2003', YMD2004', YMD2005', YMD2006', YMD2007', ...
     YMD2008', YMD2009', YMD2010', YMD2011', YMD2012', ...
     YMD2013', YMD2014']';
@@ -86,34 +87,28 @@ clear YMD2013 HHMM2013 O2013 H2013 L2013 C2013 V2013;
 clear YMD2014 HHMM2014 O2014 H2014 L2014 C2014 V2014;
 
 %% define wavelet param
-tptr = 'sqtwolog';
-sorh = 's';
-% scal = 'sln';
-% wname = 'sym8';
-scal = 'mln';
-wname = 'sym4';
-lev = 5;
-
 waveletParam.tptr = 'sqtwolog';
 waveletParam.sorh = 's';
 % waveletParam.scal = 'sln';
 % waveletParam.wname = 'sym8';
-waveletParam.scal = 'mln';
+waveletParam.scal = 'mln';   
 waveletParam.wname = 'sym4';
 waveletParam.lev = 5;
 
-%% define indicator param
-indPrd = 5;
-waveletLen = 512;
-lookForwardLen = 10;
+%% define param
+indPrd = 10;
+waveletLen = 1024;
+lookForwardLen = 5;
 dim = 6;
 
 %% 
+fprintf('fetch train data:\n');
 saveData2(train_h, train_l, train_c, indPrd, ...
     lookForwardLen, dim, waveletLen, waveletParam, ...
     trainLen, 'trainImages', 'trainLabels');
 
 %%
+fprintf('fetch test data:\n');
 saveData2(test_h, test_l, test_c, indPrd, ...
     lookForwardLen, dim, waveletLen, waveletParam, ...
     testLen, 'testImages', 'testLabels');

@@ -1,12 +1,4 @@
-﻿'''
-A Recurrent Neural Network (LSTM) implementation example using TensorFlow library.
-This example is using the MNIST database of handwritten digits (http://yann.lecun.com/exdb/mnist/)
-Long Short Term Memory paper: http://deeplearning.cs.cmu.edu/pdfs/Hochreiter97_lstm.pdf
-
-Author: Aymeric Damien
-Project: https://github.com/aymericdamien/TensorFlow-Examples/
-'''
-from __future__ import print_function
+﻿from __future__ import print_function
 
 import tensorflow as tf
 from tensorflow.python.ops import rnn, rnn_cell
@@ -133,7 +125,7 @@ def extract_images(f):
   data = data.reshape(num_images, rows, cols, 1)
   return data
 	
-def extract_labels(f, one_hot=False, num_classes=3):
+def extract_labels(f, one_hot=False, num_classes=2):
   num_items = _read32(f)
   buf = f.read(num_items)
   labels = numpy.frombuffer(buf, dtype=numpy.uint8)
@@ -147,16 +139,16 @@ def read_data(train_dir,
                    dtype=dtypes.float32,
                    reshape=True,
                    validation_size=5000):				   
-  with open(train_dir + 'trainImages_20', 'rb') as f:
+  with open(train_dir + 'trainImages', 'rb') as f:
     train_images = extract_images(f)
 
-  with open(train_dir + 'trainLabels_20', 'rb') as f:
+  with open(train_dir + 'trainLabels', 'rb') as f:
     train_labels = extract_labels(f, one_hot=one_hot)
 
-  with open(train_dir + 'testImages_20', 'rb') as f:
+  with open(train_dir + 'testImages', 'rb') as f:
     test_images = extract_images(f)
 
-  with open(train_dir + 'testLabels_20', 'rb') as f:
+  with open(train_dir + 'testLabels', 'rb') as f:
     test_labels = extract_labels(f, one_hot=one_hot)
 
   train = DataSet(train_images, train_labels, dtype=dtype, reshape=reshape)
@@ -164,7 +156,7 @@ def read_data(train_dir,
 
   return Datasets(train=train, test=test)
 
-#pdb.set_trace() 
+# pdb.set_trace() 
 # print(mnist.train.labels[0])
 mnist = read_data("../MATLAB/", one_hot=True) 
 
@@ -184,7 +176,7 @@ display_step = 100
 n_input = 6 # MNIST data input (img shape: 28*28)
 n_steps = 6 # timesteps
 n_hidden = 288 # hidden layer num of features
-n_classes = 3 # MNIST total classes (0-9 digits)
+n_classes = 2 # MNIST total classes (0-9 digits)
 
 # tf Graph input
 x = tf.placeholder("float", [None, n_steps, n_input])

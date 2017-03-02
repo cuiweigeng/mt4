@@ -77,12 +77,10 @@ for i=1:len-lookForwardLen-waveletLen
         waveletParam.lev, waveletParam.wname) * 100000; 
 
     lookForwardCw = realCw(end);
-    if lookForwardCw - realCw(range(end)) > 0
-        verifyData(i) = 1;
-    elseif lookForwardCw - realCw(range(end)) < 0
-        verifyData(i) = 2;
-    else
+    if lookForwardCw - realCw(range(end)) >= 0
         verifyData(i) = 0;
+    else 
+        verifyData(i) = 1;
     end
     
     %%

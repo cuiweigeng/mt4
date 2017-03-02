@@ -23,6 +23,7 @@ if indCalcLen <= indPrd+dim+1;
 end
     
 %% start !!!
+tic;
 for i=1:len-lookForwardLen-waveletLen
     range = i:waveletLen+i-1;
     
@@ -35,18 +36,19 @@ for i=1:len-lookForwardLen-waveletLen
         waveletParam.scal, waveletParam.lev, waveletParam.wname) * 100000; 
     
     %% indicator, calc 1/4, must > prd+dim
-%     maH = ma(tmpH, waveletLen, indPrd);
-%     maL = ma(tmpL, waveletLen, indPrd);
-    
+ 
 %     cla;
+%     realCw = wden(C(1:waveletLen+i+lookForwardLen-1), ...
+%         waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
+%         waveletParam.lev, waveletParam.wname) * 100000; 
 %     tmpC = wden(C(1:waveletLen+i-1), waveletParam.tptr, waveletParam.sorh, ...
 %         waveletParam.scal, waveletParam.lev, waveletParam.wname) * 100000;
 %     plot(C(range)*100000,'k');hold on;
 %     plot(tmpC(range),'b*');hold on;
 %     plot(realCw(range),'r--');
     
-    maH = indicators(tmpH(end-indCalcLen:end), 'sma', indPrd);
-    maL = indicators(tmpL(end-indCalcLen:end), 'sma', indPrd);
+%     maH = indicators(tmpH(end-indCalcLen:end), 'sma', indPrd);
+%     maL = indicators(tmpL(end-indCalcLen:end), 'sma', indPrd);
     maC = indicators(tmpC(end-indCalcLen:end), 'sma', indPrd);
 
     rsiC = rsindex(tmpC(end-indCalcLen:end), indPrd);
@@ -54,7 +56,7 @@ for i=1:len-lookForwardLen-waveletLen
     stochC = stoch(tmpC(end-indCalcLen:end), ...
         length(tmpC(end-indCalcLen:end)), indPrd);
 
-    [mid, uppr, lowr] = bollinger(tmpC(end-indCalcLen:end), indPrd, 0, 2.0);
+    [~, uppr, lowr] = bollinger(tmpC(end-indCalcLen:end), indPrd, 0, 2.0);
     
     cciC = indicators([tmpH(end-indCalcLen:end), ...
         tmpL(end-indCalcLen:end), ...

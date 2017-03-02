@@ -120,8 +120,6 @@ def extract_images(f):
     buf.append(_read32(f))
     count = count + 1
   data = numpy.array(buf)
-  #buf = f.read(rows * cols * num_images * 4)
-  #data = numpy.frombuffer(buf, dtype=numpy.int32)
   data = data.reshape(num_images, rows, cols, 1)
   return data
 	

@@ -96,9 +96,9 @@ waveletParam.wname = 'sym4';
 waveletParam.lev = 5;
 
 %% define param
-indPrd = 10;
+indPrd = 20;
 waveletLen = 1024;
-lookForwardLen = 5;
+lookForwardLen = 40;
 dim = 6;
 
 %% 

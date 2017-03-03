@@ -23,8 +23,9 @@ if indCalcLen <= indPrd+dim+1;
 end
     
 %% start !!!
-tic;
+% tic;
 for i=1:len-lookForwardLen-waveletLen
+    tic;
     range = i:waveletLen+i-1;
     
     %% time start at waveletLen
@@ -41,11 +42,9 @@ for i=1:len-lookForwardLen-waveletLen
 %     realCw = wden(C(1:waveletLen+i+lookForwardLen-1), ...
 %         waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
 %         waveletParam.lev, waveletParam.wname) * 100000; 
-%     tmpC = wden(C(1:waveletLen+i-1), waveletParam.tptr, waveletParam.sorh, ...
-%         waveletParam.scal, waveletParam.lev, waveletParam.wname) * 100000;
-%     plot(C(range)*100000,'k');hold on;
-%     plot(tmpC(range),'b*');hold on;
-%     plot(realCw(range),'r--');
+%     plot(C(range(1):range(end)+lookForwardLen)*100000,'k');hold on;
+%     plot(tmpC,'b*');hold on;
+%     plot(realCw(range(1):range(end)+lookForwardLen),'r--');
     
 %     maH = indicators(tmpH(end-indCalcLen:end), 'sma', indPrd);
 %     maL = indicators(tmpL(end-indCalcLen:end), 'sma', indPrd);
@@ -95,12 +94,14 @@ for i=1:len-lookForwardLen-waveletLen
     fwrite(fidVerify, verifyData(i), 'uchar');
 
     %% info
-    if(rem(i, 1000) == 0) 
-        toc
-        fprintf('proc num = %d, total num = %d\n', ...
-            i, len-lookForwardLen-waveletLen);
-        tic
-    end
+%     if(rem(i, 1000) == 0) 
+%         toc
+%         fprintf('proc num = %d, total num = %d\n', ...
+%             i, len-lookForwardLen-waveletLen);
+%         tic
+%     end
+    toc
+    fprintf('run');
 end
 
 fclose(fidTrain);

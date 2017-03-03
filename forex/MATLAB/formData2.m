@@ -98,7 +98,7 @@ waveletParam.lev = 5;
 %% define param
 indPrd = 20;
 waveletLen = 1024;
-lookForwardLen = 40;
+lookForwardLen = 10;
 dim = 6;
 
 %% 

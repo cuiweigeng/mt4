@@ -98,21 +98,23 @@ waveletParam.wname = 'sym4';
 waveletParam.lev = 5;
 
 %% define param
-indPrd = 20;
-waveletLen = 1024;
-lookForwardLen = 10;
-dim = 6;
+indPrd = 10;
+waveletLen = 128;
+lookForwardLen = 5;
+row = 1; % num of indicator
+col = 6; % indicator his
+
 
 %% 
 fprintf('fetch train data:\n');
 saveData2(train_h, train_l, train_c, indPrd, ...
-    lookForwardLen, dim, waveletLen, waveletParam, ...
+    lookForwardLen, row, col, waveletLen, waveletParam, ...
     trainLen, 'trainImages', 'trainLabels');
 
 %%
 fprintf('fetch test data:\n');
 saveData2(test_h, test_l, test_c, indPrd, ...
-    lookForwardLen, dim, waveletLen, waveletParam, ...
+    lookForwardLen, row, col, waveletLen, waveletParam, ...
     testLen, 'testImages', 'testLabels');
 
 

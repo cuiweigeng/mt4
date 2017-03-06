@@ -98,16 +98,44 @@ waveletParam.wname = 'sym4';
 waveletParam.lev = 5;
 
 %% define param
-indPrd = 10;
-waveletLen = 128;
-lookForwardLen = 5;
+indPrd = 5;
+waveletLen = 256;
+lookForwardLen = 10;
 row = 1; % num of indicator
 col = 6; % indicator his
 
+%%
+% trainLen=3000;
+% waveWin = 256;
+% filt = zeros(trainLen, 1); 
+% for i=waveWin:trainLen
+%     tmp = wden(train_c(i-waveWin+1:i), waveletParam.tptr, waveletParam.sorh, ...
+%         waveletParam.scal, waveletParam.lev, waveletParam.wname);
+%     filt(i) = tmp(end);
+%     if(rem(i, 1000) == 0) 
+%         toc
+%         fprintf('proc num = %d, total num = %d\n', ...
+%             i, trainLen-waveWin);
+%         tic
+%     end
+% end
+
+% waveWin = 2048;
+% filt2 = zeros(trainLen, 1);
+% for i=waveWin:trainLen
+%     tmp = wden(train_c(i-waveWin+1:i), waveletParam.tptr, waveletParam.sorh, ...
+%         waveletParam.scal, waveletParam.lev, waveletParam.wname);
+%     filt2(i) = tmp(end);
+% end
+
+% maC = indicators(train_c(1:trainLen), 'sma', 5);
+% plot(train_c(waveWin:trainLen),'k');
+% hold on;
+% plot(filt2(waveWin:trainLen),'b');
 
 %% 
-fprintf('fetch train data:\n');
-saveData2(train_h, train_l, train_c, indPrd, ...
+% fprintf('fetch train data:\n');
+  saveData2(train_h, train_l, train_c, indPrd, ...
     lookForwardLen, row, col, waveletLen, waveletParam, ...
     trainLen, 'trainImages', 'trainLabels');
 

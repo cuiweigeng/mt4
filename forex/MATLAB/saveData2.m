@@ -19,26 +19,17 @@ indCalcLen = indPrd+col;
 tic;
 for i=1:len-lookForwardLen-waveletLen
 %     tic;
-    range = i:waveletLen+i-1;
+    range0 = i:waveletLen+i-1;
     
     %% time start at waveletLen
-    cWlTmp = wden(C(range), waveletParam.tptr, waveletParam.sorh, ...
+    cWlTmp = wden(C(range0), waveletParam.tptr, waveletParam.sorh, ...
         waveletParam.scal, waveletParam.lev, waveletParam.wname) * 100000; 
     
 %     toc
 %     tic
 
     %% indicator, calc 1/4, must > prd+dim
- 
-%     cla;
-%     cWl = wden(C(1:waveletLen+i+lookForwardLen-1), ...
-%         waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
-%         waveletParam.lev, waveletParam.wname) * 100000; 
-%     plot(C(range(1):range(end)+lookForwardLen)*100000,'k');hold on;
-%     plot(cWlTmp,'b*');hold on;
-%     plot(cWl(range(1):range(end)+lookForwardLen),'r--');
-    
-    maC = indicators(cWlTmp(end-indCalcLen+1:end), 'sma', indPrd);
+%     maC = indicators(cWlTmp(end-indCalcLen+1:end), 'sma', indPrd);
 
 %     rsiC = rsindex(cWlTmp(end-indCalcLen+1:end), indPrd);
 
@@ -65,7 +56,9 @@ for i=1:len-lookForwardLen-waveletLen
 %     trainData(i, 2, :) = normalization(cciC(end-col+1:end));
 %     trainData(i, 2, :) = normalization(rocC(end-col+1:end));
     
-    trainData(i, 1, :) = normalization(maC(end-col+1:end));
+%     trainData(i, 1, :) = normalization(maC(end-col+1:end));
+%     trainData(i, 1, :) = normalization(rocC(end-col+1:end));
+    trainData(i, 1, :) = normalization(cWlTmp(end-col+1:end));
     
 %     toc
 %     tic
@@ -75,7 +68,7 @@ for i=1:len-lookForwardLen-waveletLen
         waveletParam.tptr, waveletParam.sorh, waveletParam.scal, ...
         waveletParam.lev, waveletParam.wname) * 100000; 
     
-%     if lookForwardCw - cWl(end-lookForwardLen) >= 0
+%     if C(range(end)) - C(range0(end)) >= 0
     if cWl(end) - cWlTmp(end) >= 0
         verifyData(i) = 0;
     else 
@@ -83,6 +76,13 @@ for i=1:len-lookForwardLen-waveletLen
     end
 %     toc
 %     tic
+
+    %%
+%     cla;
+%     plot(C(range(1):range(end))*100000,'k');hold on;
+%     plot(cWlTmp,'b*');hold on;
+%     plot(cWl,'r--');
+    
     %%
 
     for j=1:row

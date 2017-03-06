@@ -100,7 +100,7 @@ def dense_to_one_hot(labels_dense, num_classes):
   
 def extract_images(f): 
   num_images = _read32(f)
-  rows = 6;
+  rows = 5;
   cols = 1;
 
   buf = []
@@ -112,7 +112,7 @@ def extract_images(f):
   data = data.reshape(num_images, rows, cols, 1)
   return data
 	
-def extract_labels(f, one_hot=False, num_classes=2):
+def extract_labels(f, one_hot=False, num_classes=3):
   num_items = _read32(f)
   buf = f.read(num_items)
   labels = numpy.frombuffer(buf, dtype=numpy.uint8)
@@ -156,14 +156,14 @@ forex = read_data("../MATLAB/", one_hot=True)
 # Parameters
 learning_rate = 0.001
 training_iters = 100000
-batch_size = 144
+batch_size = 120
 display_step = 100
 
 # Network Parameters
 n_input = 1 # MNIST data input (img shape: 28*28)
-n_steps = 6 # timesteps
-n_hidden = 72 # hidden layer num of features
-n_classes = 2 # MNIST total classes (0-9 digits)
+n_steps = 5 # timesteps
+n_hidden = 120 # hidden layer num of features
+n_classes = 3 # MNIST total classes (0-9 digits)
 
 # tf Graph input
 x = tf.placeholder("float", [None, n_steps, n_input])
@@ -238,17 +238,21 @@ with tf.Session() as sess:
     print("Optimization Finished!")
 
     # Calculate accuracy for 128 forex test images
-    #test_len = 5000
+    #test_len = 6000
     #test_data = forex.test.images[:test_len-1].reshape((-1, n_steps, n_input))
     #test_label = forex.test.labels[:test_len-1]
     #print("Testing Accuracy:", \
     #    sess.run(accuracy, feed_dict={x: test_data, y: test_label}))
     
     #pdb.set_trace()	
-    f=open('result.txt','w')
+    f=open('../MATLAB/result.txt','w')
+    f2=open('../MATLAB/result2.txt','w')
     for i in range(0, 6000):	
         test_data = forex.test.images[i].reshape((-1, n_steps, n_input))	
-        test_label = forex.test.labels[i].reshape((-1, 2))	
-        result = sess.run(accuracy, feed_dict={x: test_data, y: test_label})
+        test_label = forex.test.labels[i].reshape((-1, 3))	
+        result = sess.run(pred, feed_dict={x: test_data})
         f.write(str(result)+'\n')
-    f.close()		
+        result = sess.run(accuracy, feed_dict={x: test_data, y: test_label})
+        f2.write(str(result)+'\n')
+    f.close()	
+    f2.close()		
